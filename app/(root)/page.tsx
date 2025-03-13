@@ -17,6 +17,19 @@ const Home = async () => {
 
   const roomDocuments = await getDocuments(clerkUser.emailAddresses[0].emailAddress);
 
+  const handleDownload = async (id: string) => {
+    const response = await fetch(`/api/documents/${id}/download`);
+    const blob = await response.blob();
+    const url = window.URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `document_${id}.pdf`; 
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    window.URL.revokeObjectURL(url);
+  };
+
   return (
     <main className="home-container">
       <Header className="sticky left-0 top-0">
@@ -54,7 +67,10 @@ const Home = async () => {
                     <p className="text-sm font-light text-blue-100">Created about {dateConverter(createdAt)}</p>
                   </div>
                 </Link>
-                <DeleteModal roomId={id} />
+                <div className="flex gap-2">
+                  <Button onClick={() => handleDownload(id)}>Download</Button>
+                  <DeleteModal roomId={id} />
+                </div>
               </li>
             ))}
           </ul>
@@ -79,4 +95,4 @@ const Home = async () => {
   )
 }
 
-export default Home
+export default Home;
